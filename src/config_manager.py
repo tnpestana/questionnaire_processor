@@ -67,11 +67,11 @@ def create_default_config(config_path):
             'Category 3 (Work Environment)': 'Category 3: Please provide any suggestions for improvement.'
         },
         'likert_mapping': {
-            'Strongly Disagree': -1.0,
-            'Disagree': -0.33,
-            'Neutral': 0.33,
-            'Agree': 1.0,
-            'Strongly Agree': 1.0,
+            'Strongly Disagree': -2,
+            'Disagree': -1,
+            'Neutral': 0,
+            'Agree': 1,
+            'Strongly Agree': 1,
             'I don\'t know': None
         },
         'analysis': {
