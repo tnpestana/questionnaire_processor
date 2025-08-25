@@ -31,64 +31,6 @@ def load_config(config_path="config.yaml"):
         raise
 
 
-def create_default_config(config_path):
-    """
-    Create a default configuration file if one doesn't exist.
-    """
-    default_config = {
-        'data_source': {
-            'file_path': 'input/User Categorization Form(1-25).xlsx',
-            'sheet_name': ''
-        },
-        'columns': {
-            'team_column': 'Which team are you part of?',
-            'location_column': 'Select your primary work location'
-        },
-        'categories': {
-            'Category 1 (Team Support & Tools)': [
-                'I feel well supported by my team.',
-                'The tools I use are effective for my work.',
-                'Communication within my team is clear.'
-            ],
-            'Category 2 (Professional Growth)': [
-                'I have opportunities for professional growth.',
-                'My contributions are recognized.',
-                'I receive constructive feedback regularly.'
-            ],
-            'Category 3 (Work Environment)': [
-                'I have a good work-life balance.',
-                'The workplace environment is positive.',
-                'I am satisfied with the resources provided.'
-            ]
-        },
-        'comment_fields': {
-            'Category 1 (Team Support & Tools)': 'Category 1: Please provide any suggestions for improvement.',
-            'Category 2 (Professional Growth)': 'Category 2: Please provide any suggestions for improvement.',
-            'Category 3 (Work Environment)': 'Category 3: Please provide any suggestions for improvement.'
-        },
-        'likert_mapping': {
-            'Strongly Disagree': -2,
-            'Disagree': -1,
-            'Neutral': 0,
-            'Agree': 1,
-            'Strongly Agree': 1,
-            'I don\'t know': None
-        },
-        'analysis': {
-            'significant_difference_threshold': 0.2,
-            'similar_threshold': 0.1
-        },
-        'output': {
-            'include_timestamp': True,
-            'formats': ['json', 'txt', 'excel'],
-            'output_directory': 'output'
-        }
-    }
-    
-    with open(config_path, 'w', encoding='utf-8') as f:
-        yaml.dump(default_config, f, default_flow_style=False, allow_unicode=True)
-    print(f"📄 Default configuration created: {config_path}")
-
 
 def validate_config(config):
     """
@@ -131,7 +73,7 @@ def get_output_settings(config):
     
     return {
         'include_timestamp': output_config.get('include_timestamp', True),
-        'formats': output_config.get('formats', ['json', 'txt']),
+        'formats': output_config.get('formats', ['json', 'txt', 'excel']),
         'output_directory': output_config.get('output_directory', '')
     }
 
