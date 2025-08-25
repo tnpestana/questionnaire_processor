@@ -69,11 +69,4 @@ output:
   # Include timestamp in output filenames
   include_timestamp: true
   
-  # File formats to generate (json, txt, excel)
-  formats:
-    - json  
-    - txt
-    - excel
   
-  # Output directory (default: output folder)
-  output_directory: "output"

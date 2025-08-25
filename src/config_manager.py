@@ -73,8 +73,6 @@ def get_output_settings(config):
     
     return {
         'include_timestamp': output_config.get('include_timestamp', True),
-        'formats': output_config.get('formats', ['json', 'txt', 'excel']),
-        'output_directory': output_config.get('output_directory', '')
     }
 
 

@@ -1,6 +1,6 @@
-# Form Analysis Tool - Modular Architecture
+# Form Analysis Tool
 
-A configurable, modular tool for analyzing Likert scale form responses with team and location categorizations.
+A configurable tool for analyzing Likert scale form responses with team and location categorizations.
 
 ## Project Structure
 
@@ -20,9 +20,9 @@ csv_form_analysis/
 │   └── user_interface.py        # User interaction
 └── output/                      # 📂 Generated reports
     └── [timestamped_run_folders]/
-        ├── data.csv             # Processed data
         ├── summary.json         # Analysis summary
-        └── report.txt           # Detailed report
+        ├── report.txt           # Detailed report
+        └── dashboard.xlsx       # Excel dashboard with charts
 ```
 
 ## Core Modules
@@ -77,8 +77,6 @@ categories:
 
 # Output settings
 output:
-  formats: ["csv", "json", "txt"]
-  output_directory: "results/"
   include_timestamp: true
 ```
 
@@ -96,35 +94,10 @@ output:
 
 ### 📄 Organized Output Structure
 - **Timestamped Run Directories**: Each analysis creates a unique folder (e.g., `20250825_143022_Engineering_London/`)
-- **CSV**: Processed data with numeric conversions (`data.csv`)
 - **JSON**: Structured analysis results and metadata (`summary.json`)
 - **TXT**: Human-readable comprehensive reports (`report.txt`)
+- **Excel**: Interactive dashboard with charts and breakdowns (`dashboard.xlsx`)
 
-### 🏗️ Modular Design
-- **Separation of Concerns**: Each module handles specific functionality
-- **Easy Testing**: Individual modules can be tested independently  
-- **Maintainable**: Clear interfaces between components
-- **Extensible**: Add new features without affecting existing code
-
-## Module Responsibilities
-
-| Module | Purpose | Key Functions |
-|--------|---------|---------------|
-| `config_manager` | Configuration | `load_config()`, `validate_config()` |
-| `data_processor` | Data handling | `load_data()`, `extract_likert_scores()` |
-| `analyzer` | Statistics | `generate_detailed_statistics()`, `get_recommendations()` |
-| `output_generator` | File output | `save_analysis_results()` |
-| `user_interface` | User interaction | `get_user_selections()`, `display_analysis_results()` |
-| `analyze_forms` | Orchestration | `main()` - coordinates all modules |
-
-## Benefits of Modular Architecture
-
-1. **Maintainability**: Changes to one area don't affect others
-2. **Testability**: Each module can be tested in isolation
-3. **Reusability**: Modules can be imported and used independently
-4. **Clarity**: Each file has a single, clear purpose
-5. **Collaboration**: Multiple developers can work on different modules
-6. **Extensibility**: New features can be added as new modules
 
 ## Getting Started
 

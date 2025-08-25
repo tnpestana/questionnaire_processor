@@ -239,39 +239,32 @@ def save_analysis_results(df, stats, categories, comment_fields, recommendations
     Returns:
         tuple: (run_directory_path, list_of_generated_filenames)
     """
-    # Get base output directory (default to 'output' if not specified)
-    base_output_dir = output_settings.get('output_directory', 'output')
-    
-    # Create timestamped run directory
-    run_dir = create_run_directory(base_output_dir, selected_team, selected_location)
+    # Create timestamped run directory (always use 'output' folder)
+    run_dir = create_run_directory('output', selected_team, selected_location)
     
     generated_files = []
-    formats = output_settings['formats']
     
     print("\n" + "=" * 50)
     print(f"💾 SAVING ANALYSIS RESULTS")
     print("=" * 50)
     
-    # Save JSON summary
-    if 'json' in formats:
-        json_file = save_json_summary(stats, run_dir)
-        generated_files.append(json_file)
-        print(f"📋 Summary saved to: {os.path.basename(json_file)}")
+    # Always save JSON summary
+    json_file = save_json_summary(stats, run_dir)
+    generated_files.append(json_file)
+    print(f"📋 Summary saved to: {os.path.basename(json_file)}")
     
-    # Save text report
-    if 'txt' in formats:
-        txt_file = generate_text_report(stats, categories, recommendations, run_dir)
-        generated_files.append(txt_file)
-        print(f"📄 Report saved to: {os.path.basename(txt_file)}")
+    # Always save text report
+    txt_file = generate_text_report(stats, categories, recommendations, run_dir)
+    generated_files.append(txt_file)
+    print(f"📄 Report saved to: {os.path.basename(txt_file)}")
     
-    # Save Excel dashboard with charts
-    if 'excel' in formats:
-        excel_file = create_excel_dashboard(
-            stats, categories, comment_fields, overall_df, df,
-            team_column, location_column, selected_team, selected_location, run_dir
-        )
-        generated_files.append(excel_file)
-        print(f"📊 Excel dashboard saved to: {os.path.basename(excel_file)}")
+    # Always save Excel dashboard with charts
+    excel_file = create_excel_dashboard(
+        stats, categories, comment_fields, overall_df, df,
+        team_column, location_column, selected_team, selected_location, run_dir
+    )
+    generated_files.append(excel_file)
+    print(f"📊 Excel dashboard saved to: {os.path.basename(excel_file)}")
     
     print(f"\n📁 All files saved in: {run_dir}")
     
