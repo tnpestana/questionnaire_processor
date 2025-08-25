@@ -43,16 +43,17 @@ def load_data(file_path, sheet_name=None):
         raise Exception(f"Error loading data from {file_path}: {e}")
 
 
-def extract_likert_scores(df, categories):
+def extract_likert_scores(df, categories, likert_mapping=None):
     """
     Extract numeric scores from Likert scale responses and group by categories.
     
-    Converts responses like "Strongly Agree (1)" to numeric value 1.
-    Groups questions into logical categories based on configuration.
+    Converts responses using either embedded scores like "Strongly Agree (1)" 
+    or text mapping from configuration.
     
     Args:
         df (pandas.DataFrame): The form data
         categories (dict): Dictionary mapping category names to question lists
+        likert_mapping (dict): Optional mapping of response text to numeric scores
         
     Returns:
         tuple: (DataFrame with numeric columns, category groupings)
@@ -73,15 +74,31 @@ def extract_likert_scores(df, categories):
     for col in likert_columns:
         numeric_col = col + '_numeric'
         
-        def extract_number(text):
+        def extract_score(text):
             if pd.isna(text):
                 return np.nan
-            match = re.search(r'\(([+-]?\d+)\)', str(text))
+            
+            text_str = str(text).strip()
+            
+            # First try mapping if provided
+            if likert_mapping:
+                # Try exact match first
+                if text_str in likert_mapping:
+                    return likert_mapping[text_str]
+                
+                # Try case-insensitive match
+                for key, value in likert_mapping.items():
+                    if text_str.lower() == key.lower():
+                        return value
+            
+            # Fallback to regex for embedded scores like "Strongly Agree (1)"
+            match = re.search(r'\(([+-]?\d+)\)', text_str)
             if match:
                 return int(match.group(1))
+            
             return np.nan
         
-        df_numeric[numeric_col] = df[col].apply(extract_number)
+        df_numeric[numeric_col] = df[col].apply(extract_score)
         
         # Find which category this question belongs to
         category_name = "Uncategorized"

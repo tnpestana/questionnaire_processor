@@ -66,6 +66,14 @@ def create_default_config(config_path):
             'Category 2 (Professional Growth)': 'Category 2: Please provide any suggestions for improvement.',
             'Category 3 (Work Environment)': 'Category 3: Please provide any suggestions for improvement.'
         },
+        'likert_mapping': {
+            'Strongly Disagree': -1.0,
+            'Disagree': -0.33,
+            'Neutral': 0.33,
+            'Agree': 1.0,
+            'Strongly Agree': 1.0,
+            'I don\'t know': None
+        },
         'analysis': {
             'significant_difference_threshold': 0.2,
             'similar_threshold': 0.1

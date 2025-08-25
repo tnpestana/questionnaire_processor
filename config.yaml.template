@@ -46,6 +46,16 @@ comment_fields:
   "Category 2 (Professional Growth)": "Category 2: Please provide any suggestions for improvement."
   "Category 3 (Work Environment)": "Category 3: Please provide any suggestions for improvement."
 
+# Likert Scale Response Mapping
+# Map response text to numeric scores (normalized to -1 to 1 range)
+likert_mapping:
+  "Strongly Disagree": -1.0
+  "Disagree": -0.33
+  "Neutral": 0.33
+  "Agree": 1.0
+  "Strongly Agree": 1.0
+  "I don't know": null  # Will be ignored in analysis
+
 # Analysis Settings
 analysis:
   # Threshold for determining if scores are significantly different

@@ -41,7 +41,8 @@ def main():
         validate_columns(df, columns['team_column'], columns['location_column'])
         
         # Extract numeric scores from Likert responses
-        df_numeric, categories = extract_likert_scores(df, categories)
+        likert_mapping = config.get('likert_mapping', None)
+        df_numeric, categories = extract_likert_scores(df, categories, likert_mapping)
         
         # Analyze available groups
         group_info = analyze_available_groups(
