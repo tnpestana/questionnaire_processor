@@ -2,7 +2,7 @@
 """
 Output Generation Module
 
-Handles file output generation in multiple formats (CSV, JSON, TXT).
+Handles file output generation in multiple formats (JSON, TXT, Excel).
 """
 
 import json
@@ -56,21 +56,6 @@ def generate_filename(base_name, extension, run_dir):
     filename = f"{base_name}.{extension}"
     return os.path.join(run_dir, filename)
 
-
-def save_csv_data(df, run_dir):
-    """
-    Save processed data to CSV format.
-    
-    Args:
-        df (pandas.DataFrame): Data to save
-        run_dir (str): Run directory path
-        
-    Returns:
-        str: Filename of saved file
-    """
-    filename = generate_filename("data", "csv", run_dir)
-    df.to_csv(filename, index=False)
-    return filename
 
 
 def save_json_summary(stats, run_dir):
@@ -266,12 +251,6 @@ def save_analysis_results(df, stats, categories, comment_fields, recommendations
     print("\n" + "=" * 50)
     print(f"💾 SAVING ANALYSIS RESULTS")
     print("=" * 50)
-    
-    # Save CSV data
-    if 'csv' in formats:
-        csv_file = save_csv_data(df, run_dir)
-        generated_files.append(csv_file)
-        print(f"📊 Data saved to: {os.path.basename(csv_file)}")
     
     # Save JSON summary
     if 'json' in formats:
