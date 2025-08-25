@@ -65,7 +65,20 @@ def extract_likert_scores(df, categories, likert_mapping=None):
     for col in df.columns:
         if df[col].dtype == 'object':
             sample_values = df[col].dropna().head().tolist()
-            if any('(' in str(val) and ')' in str(val) for val in sample_values):
+            
+            # Check for embedded scores (legacy format)
+            has_parentheses = any('(' in str(val) and ')' in str(val) for val in sample_values)
+            
+            # Check for mapped responses if mapping is provided
+            has_mapped_values = False
+            if likert_mapping:
+                has_mapped_values = any(
+                    str(val).strip() in likert_mapping or
+                    any(str(val).strip().lower() == key.lower() for key in likert_mapping.keys())
+                    for val in sample_values
+                )
+            
+            if has_parentheses or has_mapped_values:
                 likert_columns.append(col)
     
     print(f"📊 Converting {len(likert_columns)} Likert scale questions grouped into {len(categories)} categories...")
