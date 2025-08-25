@@ -1,0 +1,70 @@
+# Form Analysis Configuration Template
+# Copy this file to config.yaml and customize for your project
+
+# Data Source Configuration
+data_source:
+  # Path to the Excel/CSV file containing form responses
+  file_path: "input/your-form-data.xlsx"
+  
+  # Sheet name (for Excel files only, leave empty for default first sheet)
+  sheet_name: ""
+
+# Column Mapping Configuration
+columns:
+  # Column name that contains team information
+  team_column: "Which team are you part of?"
+  
+  # Column name that contains location information
+  location_column: "Select your primary work location"
+  
+  # Optional: Additional grouping columns for future analysis
+  # department_column: "Department"
+  # role_column: "Role"
+
+# Question Categories Configuration
+# Define how questions should be grouped for analysis
+categories:
+  "Category 1 (Team Support & Tools)":
+    - "I feel well supported by my team."
+    - "The tools I use are effective for my work."
+    - "Communication within my team is clear."
+  
+  "Category 2 (Professional Growth)":
+    - "I have opportunities for professional growth."
+    - "My contributions are recognized."
+    - "I receive constructive feedback regularly."
+  
+  "Category 3 (Work Environment)":
+    - "I have a good work-life balance."
+    - "The workplace environment is positive."
+    - "I am satisfied with the resources provided."
+
+# Comment Fields Configuration
+# Map categories to their corresponding long-answer comment fields
+comment_fields:
+  "Category 1 (Team Support & Tools)": "Category 1: Please provide any suggestions for improvement."
+  "Category 2 (Professional Growth)": "Category 2: Please provide any suggestions for improvement."
+  "Category 3 (Work Environment)": "Category 3: Please provide any suggestions for improvement."
+
+# Analysis Settings
+analysis:
+  # Threshold for determining if scores are significantly different
+  significant_difference_threshold: 0.2
+  
+  # Threshold for determining if scores are similar
+  similar_threshold: 0.1
+
+# Output Configuration
+output:
+  # Include timestamp in output filenames
+  include_timestamp: true
+  
+  # File formats to generate (csv, json, txt, excel)
+  formats:
+    - csv
+    - json  
+    - txt
+    - excel
+  
+  # Output directory (default: output folder)
+  output_directory: "output"
