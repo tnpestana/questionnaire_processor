@@ -10,7 +10,7 @@ import numpy as np
 from data_processor import collect_comments
 
 
-def calculate_category_scores(df, categories):
+def calculate_category_scores(df, categories, question_mapping=None):
     """
     Calculate average scores for each category.
     
@@ -23,15 +23,30 @@ def calculate_category_scores(df, categories):
     """
     category_scores = {}
     for category_name, questions in categories.items():
-        numeric_questions = [q + '_numeric' for q in questions if q + '_numeric' in df.columns]
+        # Use question mapping to get actual column names
+        numeric_questions = []
+        for q in questions:
+            actual_question = question_mapping.get(q, q) if question_mapping else q
+            numeric_col = actual_question + '_numeric'
+            if numeric_col in df.columns:
+                numeric_questions.append(numeric_col)
+        
         if numeric_questions and len(df) > 0:
-            category_avg = df[numeric_questions].mean().mean()
-            category_scores[category_name] = category_avg
+            # Calculate average of question averages (each question gets equal weight)
+            question_averages = []
+            for col in numeric_questions:
+                col_mean = df[col].mean()
+                if not pd.isna(col_mean):
+                    question_averages.append(col_mean)
+            
+            if question_averages:
+                category_avg = np.mean(question_averages)
+                category_scores[category_name] = category_avg
     
     return category_scores
 
 
-def compare_with_overall(filtered_df, overall_df, categories):
+def compare_with_overall(filtered_df, overall_df, categories, question_mapping=None):
     """
     Compare filtered data scores with overall averages.
     
@@ -46,14 +61,33 @@ def compare_with_overall(filtered_df, overall_df, categories):
     comparisons = {}
     
     for category_name, questions in categories.items():
-        numeric_questions = [q + '_numeric' for q in questions if q + '_numeric' in overall_df.columns]
+        # Use question mapping to get actual column names
+        numeric_questions = []
+        for q in questions:
+            actual_question = question_mapping.get(q, q) if question_mapping else q
+            numeric_col = actual_question + '_numeric'
+            if numeric_col in overall_df.columns:
+                numeric_questions.append(numeric_col)
+        
         if numeric_questions:
+            # Calculate averages for filtered data (average of question averages)
             if len(filtered_df) > 0:
-                filtered_avg = filtered_df[numeric_questions].mean().mean()
+                question_averages = []
+                for col in numeric_questions:
+                    col_mean = filtered_df[col].mean()
+                    if not pd.isna(col_mean):
+                        question_averages.append(col_mean)
+                filtered_avg = np.mean(question_averages) if question_averages else 0
             else:
                 filtered_avg = 0
             
-            overall_avg = overall_df[numeric_questions].mean().mean()
+            # Calculate averages for overall data (average of question averages)
+            question_averages = []
+            for col in numeric_questions:
+                col_mean = overall_df[col].mean()
+                if not pd.isna(col_mean):
+                    question_averages.append(col_mean)
+            overall_avg = np.mean(question_averages) if question_averages else 0
             difference = filtered_avg - overall_avg
             
             comparisons[category_name] = {
@@ -118,11 +152,11 @@ def generate_detailed_statistics(filtered_df, overall_df, categories, comment_fi
     }
     
     # Category performance for filtered data
-    filtered_category_scores = calculate_category_scores(filtered_df, categories)
+    filtered_category_scores = calculate_category_scores(filtered_df, categories, question_mapping)
     stats['category_performance'] = filtered_category_scores
     
     # Comparisons with overall
-    stats['comparisons'] = compare_with_overall(filtered_df, overall_df, categories)
+    stats['comparisons'] = compare_with_overall(filtered_df, overall_df, categories, question_mapping)
     
     # Detailed question analysis
     question_details = {}
