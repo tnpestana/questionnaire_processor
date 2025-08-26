@@ -91,7 +91,7 @@ def get_performance_status(difference, significant_threshold=0.2, similar_thresh
 
 
 def generate_detailed_statistics(filtered_df, overall_df, categories, comment_fields, team_column, location_column, 
-                                selected_team, selected_location):
+                                selected_team, selected_location, question_mapping=None):
     """
     Generate detailed statistics for the selected combination.
     
@@ -129,7 +129,9 @@ def generate_detailed_statistics(filtered_df, overall_df, categories, comment_fi
     for category_name, questions in categories.items():
         category_questions = {}
         for question in questions:
-            numeric_col = question + '_numeric'
+            # Use question mapping to get actual column name
+            actual_question = question_mapping.get(question, question) if question_mapping else question
+            numeric_col = actual_question + '_numeric'
             if numeric_col in filtered_df.columns:
                 if len(filtered_df) > 0:
                     filtered_score = filtered_df[numeric_col].mean()

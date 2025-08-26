@@ -56,25 +56,30 @@ def extract_likert_scores(df, categories, likert_mapping=None):
         likert_mapping (dict): Optional mapping of response text to numeric scores
         
     Returns:
-        tuple: (DataFrame with numeric columns, category groupings, missing_questions)
+        tuple: (DataFrame with numeric columns, category groupings, missing_questions, question_mapping)
     """
     df_numeric = df.copy()
     
     # Get Likert columns from categories configuration
     likert_columns = []
     missing_questions = []
+    question_mapping = {}  # Maps config question names to actual column names
+    
     for category_name, questions in categories.items():
         for question in questions:
             if question in df.columns:
                 likert_columns.append(question)
+                question_mapping[question] = question  # Exact match
             else:
                 # Try to find the question with normalized whitespace
-                normalized_question = question.replace('\u00a0', ' ').strip()
+                import re
+                normalized_question = re.sub(r'\s+', ' ', question).strip()  # Normalize all whitespace
                 found = False
                 for col in df.columns:
-                    normalized_col = col.replace('\u00a0', ' ').strip()
+                    normalized_col = re.sub(r'\s+', ' ', str(col)).strip()  # Normalize all whitespace
                     if normalized_question == normalized_col:
                         likert_columns.append(col)  # Use the actual column name from data
+                        question_mapping[question] = col  # Map config name to actual column name
                         found = True
                         break
                 
@@ -105,7 +110,8 @@ def extract_likert_scores(df, categories, likert_mapping=None):
             
             # Normalize whitespace and try again
             if likert_mapping:
-                normalized_text = text_str.replace('\u00a0', ' ').strip()
+                import re
+                normalized_text = re.sub(r'\s+', ' ', text_str).strip()  # Normalize all whitespace
                 
                 # Try normalized exact match
                 if normalized_text in likert_mapping:
@@ -113,7 +119,7 @@ def extract_likert_scores(df, categories, likert_mapping=None):
                 
                 # Try normalized case-insensitive match
                 for key, value in likert_mapping.items():
-                    normalized_key = key.replace('\u00a0', ' ').strip()
+                    normalized_key = re.sub(r'\s+', ' ', str(key)).strip()  # Normalize all whitespace
                     if normalized_text.lower() == normalized_key.lower():
                         return value
             
@@ -130,7 +136,7 @@ def extract_likert_scores(df, categories, likert_mapping=None):
         
         print(f"   ✅ {col} → {category_name}")
     
-    return df_numeric, categories, missing_questions
+    return df_numeric, categories, missing_questions, question_mapping
 
 
 def validate_columns(df, team_column, location_column):
