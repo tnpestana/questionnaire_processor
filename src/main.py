@@ -8,7 +8,7 @@ This is the main entry point for the configurable form analysis tool.
 
 import sys
 from config_manager import load_config, validate_config, get_output_settings, get_analysis_settings
-from data_processor import load_data, extract_likert_scores, validate_columns, analyze_available_groups, filter_data
+from data_processor import load_data, normalize_data, validate_columns, analyze_available_groups, filter_data
 from analyzer import generate_detailed_statistics, get_recommendations
 from output_generator import save_analysis_results
 from user_interface import get_user_selections, display_analysis_results
@@ -40,13 +40,13 @@ def main():
         # Validate required columns exist
         validate_columns(df, columns['team_column'], columns['location_column'])
         
-        # Extract numeric scores from Likert responses
+        # Normalize data: clean column names and convert Likert responses
         likert_mapping = config.get('likert_mapping', None)
-        df_numeric, categories, missing_questions, question_mapping = extract_likert_scores(df, categories, likert_mapping)
+        normalized_df, normalized_categories, missing_questions = normalize_data(df, categories, likert_mapping)
         
         # Analyze available groups
         group_info = analyze_available_groups(
-            df_numeric, 
+            normalized_df, 
             columns['team_column'], 
             columns['location_column']
         )
@@ -60,7 +60,7 @@ def main():
         
         # Filter data based on selections
         filtered_df = filter_data(
-            df_numeric,
+            normalized_df,
             columns['team_column'],
             columns['location_column'], 
             selected_team,
@@ -70,34 +70,33 @@ def main():
         # Generate detailed statistics
         stats = generate_detailed_statistics(
             filtered_df,
-            df_numeric,
-            categories,
+            normalized_df,
+            normalized_categories,
             comment_fields,
             columns['team_column'],
             columns['location_column'],
             selected_team,
-            selected_location,
-            question_mapping
+            selected_location
         )
         
         # Generate recommendations
-        recommendations = get_recommendations(stats, categories)
+        recommendations = get_recommendations(stats, normalized_categories)
         
         # Display results to console
-        display_analysis_results(stats, categories, recommendations)
+        display_analysis_results(stats, normalized_categories, recommendations)
         
         # Save analysis results to files
         run_dir, generated_files = save_analysis_results(
             filtered_df,
             stats,
-            categories,
+            normalized_categories,
             comment_fields,
             recommendations,
             selected_team,
             selected_location,
             columns['team_column'],
             columns['location_column'],
-            df_numeric,
+            normalized_df,
             output_settings,
             missing_questions
         )
@@ -108,7 +107,7 @@ def main():
         print(f"\n✨ Analysis complete for {team_name} + {location_name}!")
         print(f"📄 Generated {len(generated_files)} files in run directory")
         
-        return df_numeric
+        return normalized_df
         
     except FileNotFoundError as e:
         print(f"❌ File Error: {e}")

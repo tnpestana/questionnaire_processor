@@ -5,10 +5,10 @@ Data Processing Module
 Handles data loading, Likert scale conversion, and data validation.
 """
 
+from tools import sanitize_text
+
 import pandas as pd
 import numpy as np
-import re
-
 
 def load_data(file_path, sheet_name=None):
     """
@@ -43,50 +43,77 @@ def load_data(file_path, sheet_name=None):
         raise Exception(f"Error loading data from {file_path}: {e}")
 
 
-def extract_likert_scores(df, categories, likert_mapping=None):
+def normalize_data(df, categories, likert_mapping=None):
     """
-    Extract numeric scores from Likert scale responses and group by categories.
-    
-    Converts responses using either embedded scores like "Strongly Agree (1)" 
-    or text mapping from configuration.
+    Normalize raw survey data by cleaning column names, converting Likert responses,
+    and standardizing the DataFrame for analysis.
     
     Args:
-        df (pandas.DataFrame): The form data
+        df (pandas.DataFrame): Raw survey data
         categories (dict): Dictionary mapping category names to question lists
         likert_mapping (dict): Optional mapping of response text to numeric scores
         
     Returns:
-        tuple: (DataFrame with numeric columns, category groupings, missing_questions, question_mapping)
+        tuple: (normalized_df, categories_with_clean_names, missing_questions)
     """
-    df_numeric = df.copy()
+    import re
     
-    # Get Likert columns from categories configuration
-    likert_columns = []
+    # Step 1: Create normalized DataFrame with clean column names
+    normalized_df = df.copy()
+    column_mapping = {}  # Maps original column names to normalized names
+    reverse_mapping = {}  # Maps normalized names back to original
+    
+    # Normalize all column names
+    for col in df.columns:
+         # Replaces any sequence of whitespace with a single space " "
+        normalized_col = sanitize_text(str(col))
+        column_mapping[col] = normalized_col
+        reverse_mapping[normalized_col] = col
+        
+    # Rename columns in the DataFrame
+    normalized_df.columns = [column_mapping[col] for col in normalized_df.columns]
+    
+    # Step 2: Match questions from config to normalized columns
+    matched_questions = {}  # Maps category -> list of matched column names
     missing_questions = []
-    question_mapping = {}  # Maps config question names to actual column names
     
     for category_name, questions in categories.items():
+        matched_questions[category_name] = []
         for question in questions:
-            if question in df.columns:
-                likert_columns.append(question)
-                question_mapping[question] = question  # Exact match
+            normalized_question = sanitize_text(question)
+            
+            if normalized_question in normalized_df.columns:
+                matched_questions[category_name].append(normalized_question)
             else:
-                # Try to find the question with normalized whitespace
-                import re
-                normalized_question = re.sub(r'\s+', ' ', question).strip()  # Normalize all whitespace
-                found = False
-                for col in df.columns:
-                    normalized_col = re.sub(r'\s+', ' ', str(col)).strip()  # Normalize all whitespace
-                    if normalized_question == normalized_col:
-                        likert_columns.append(col)  # Use the actual column name from data
-                        question_mapping[question] = col  # Map config name to actual column name
-                        found = True
-                        break
-                
-                if not found:
-                    missing_questions.append((category_name, question))
+                missing_questions.append((category_name, question))
     
-    print(f"📊 Converting {len(likert_columns)} Likert scale questions grouped into {len(categories)} categories...")
+    # Step 3: Convert Likert responses to numeric values
+    def normalize_likert_response(text):
+        if pd.isna(text):
+            return np.nan
+        
+        text_str = str(text).strip()
+        
+        # Normalize whitespace in the response
+        normalized_text = sanitize_text(text_str)
+        
+        # Try mapping from config
+        if likert_mapping:
+            # Try exact match first
+            if normalized_text in likert_mapping:
+                return likert_mapping[normalized_text]
+            
+            # Try case-insensitive match
+            for key, value in likert_mapping.items():
+                normalized_key = sanitize_text(str(key))
+                if normalized_text.lower() == normalized_key.lower():
+                    return value
+        
+        return np.nan
+    
+    # Convert all matched Likert questions to numeric
+    total_questions = sum(len(questions) for questions in matched_questions.values())
+    print(f"📊 Converting {total_questions} Likert scale questions grouped into {len(categories)} categories...")
     
     if missing_questions:
         print(f"⚠️  {len(missing_questions)} questions from config not found in data:")
@@ -94,49 +121,14 @@ def extract_likert_scores(df, categories, likert_mapping=None):
             print(f"   • [{category}] {question}")
         print()
     
-    # Convert each Likert column to numeric
-    for col in likert_columns:
-        numeric_col = col + '_numeric'
-        
-        def extract_score(text):
-            if pd.isna(text):
-                return np.nan
-            
-            text_str = str(text).strip()
-            
-            # Use mapping from config - try exact match first
-            if likert_mapping and text_str in likert_mapping:
-                return likert_mapping[text_str]
-            
-            # Normalize whitespace and try again
-            if likert_mapping:
-                import re
-                normalized_text = re.sub(r'\s+', ' ', text_str).strip()  # Normalize all whitespace
-                
-                # Try normalized exact match
-                if normalized_text in likert_mapping:
-                    return likert_mapping[normalized_text]
-                
-                # Try normalized case-insensitive match
-                for key, value in likert_mapping.items():
-                    normalized_key = re.sub(r'\s+', ' ', str(key)).strip()  # Normalize all whitespace
-                    if normalized_text.lower() == normalized_key.lower():
-                        return value
-            
-            return np.nan
-        
-        df_numeric[numeric_col] = df[col].apply(extract_score)
-        
-        # Find which category this question belongs to
-        category_name = "Uncategorized"
-        for cat_name, questions in categories.items():
-            if col in questions:
-                category_name = cat_name
-                break
-        
-        print(f"   ✅ {col} → {category_name}")
+    for category_name, questions in matched_questions.items():
+        for question in questions:
+            if question in normalized_df.columns:
+                # Convert responses to numeric scores
+                normalized_df[question] = normalized_df[question].apply(normalize_likert_response)
+                print(f"   ✅ {question} → {category_name}")
     
-    return df_numeric, categories, missing_questions, question_mapping
+    return normalized_df, matched_questions, missing_questions
 
 
 def validate_columns(df, team_column, location_column):
