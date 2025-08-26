@@ -68,7 +68,18 @@ def extract_likert_scores(df, categories, likert_mapping=None):
             if question in df.columns:
                 likert_columns.append(question)
             else:
-                missing_questions.append((category_name, question))
+                # Try to find the question with normalized whitespace
+                normalized_question = question.replace('\u00a0', ' ').strip()
+                found = False
+                for col in df.columns:
+                    normalized_col = col.replace('\u00a0', ' ').strip()
+                    if normalized_question == normalized_col:
+                        likert_columns.append(col)  # Use the actual column name from data
+                        found = True
+                        break
+                
+                if not found:
+                    missing_questions.append((category_name, question))
     
     print(f"📊 Converting {len(likert_columns)} Likert scale questions grouped into {len(categories)} categories...")
     
