@@ -60,26 +60,12 @@ def extract_likert_scores(df, categories, likert_mapping=None):
     """
     df_numeric = df.copy()
     
-    # Find and convert Likert scale columns
+    # Get Likert columns from categories configuration
     likert_columns = []
-    for col in df.columns:
-        if df[col].dtype == 'object':
-            sample_values = df[col].dropna().head().tolist()
-            
-            # Check for embedded scores (legacy format)
-            has_parentheses = any('(' in str(val) and ')' in str(val) for val in sample_values)
-            
-            # Check for mapped responses if mapping is provided
-            has_mapped_values = False
-            if likert_mapping:
-                has_mapped_values = any(
-                    str(val).strip() in likert_mapping or
-                    any(str(val).strip().lower() == key.lower() for key in likert_mapping.keys())
-                    for val in sample_values
-                )
-            
-            if has_parentheses or has_mapped_values:
-                likert_columns.append(col)
+    for category_name, questions in categories.items():
+        for question in questions:
+            if question in df.columns:
+                likert_columns.append(question)
     
     print(f"📊 Converting {len(likert_columns)} Likert scale questions grouped into {len(categories)} categories...")
     
@@ -93,21 +79,15 @@ def extract_likert_scores(df, categories, likert_mapping=None):
             
             text_str = str(text).strip()
             
-            # First try mapping if provided
+            # Use mapping from config
+            if likert_mapping and text_str in likert_mapping:
+                return likert_mapping[text_str]
+            
+            # Case-insensitive fallback
             if likert_mapping:
-                # Try exact match first
-                if text_str in likert_mapping:
-                    return likert_mapping[text_str]
-                
-                # Try case-insensitive match
                 for key, value in likert_mapping.items():
                     if text_str.lower() == key.lower():
                         return value
-            
-            # Fallback to regex for embedded scores like "Strongly Agree (1)"
-            match = re.search(r'\(([+-]?\d+)\)', text_str)
-            if match:
-                return int(match.group(1))
             
             return np.nan
         
