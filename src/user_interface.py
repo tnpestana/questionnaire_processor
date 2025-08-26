@@ -130,21 +130,27 @@ def display_analysis_results(stats, categories, recommendations):
         print("⚠️  No responses found for this team+location combination!")
         return
     
-    # Category performance
+    # Category performance - maintain config order
     print(f"\n📈 Category Performance for {team_display} + {location_display}:")
-    sorted_categories = sorted(stats['category_performance'].items(), key=lambda x: x[1], reverse=True)
-    for i, (category, score) in enumerate(sorted_categories, 1):
-        print(f"   {i}. {category}: {score:.2f}")
+    for i, (category, questions) in enumerate(categories.items(), 1):
+        if category in stats['category_performance']:
+            score = stats['category_performance'][category]
+            print(f"   {i}. {category}: {score:.2f}")
     
-    # Detailed question analysis
+    # Detailed question analysis - maintain config order
     print(f"\n📊 Detailed Question Analysis:")
-    for category_name, questions_data in stats['question_details'].items():
-        print(f"\n   {category_name}:")
-        for question, data in questions_data.items():
-            if data['filtered_score'] is not None:
-                print(f"      • {question}: {data['filtered_score']:.2f} ({data['filtered_responses']} responses)")
-            else:
-                print(f"      • {question}: No data ({data['filtered_responses']} responses)")
+    for category_name, questions_list in categories.items():
+        if category_name in stats['question_details']:
+            questions_data = stats['question_details'][category_name]
+            print(f"\n   {category_name}:")
+            # Process questions in config order
+            for question in questions_list:
+                if question in questions_data:
+                    data = questions_data[question]
+                    if data['filtered_score'] is not None:
+                        print(f"      • {question}: {data['filtered_score']:.2f} ({data['filtered_responses']} responses)")
+                    else:
+                        print(f"      • {question}: No data ({data['filtered_responses']} responses)")
     
     # Comments by Category
     if 'comments' in stats and stats['comments']:

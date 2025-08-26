@@ -158,15 +158,17 @@ def generate_text_report(stats, categories, recommendations, run_dir):
         f.write("-" * 40 + "\n")
         
         if stats['category_performance']:
-            sorted_categories = sorted(stats['category_performance'].items(), key=lambda x: x[1], reverse=True)
-            for i, (category, score) in enumerate(sorted_categories, 1):
-                # Show comparison with overall average
-                comparison = stats['comparisons'].get(category, {})
-                overall_avg = comparison.get('overall_score', 0)
-                difference = comparison.get('difference', 0)
-                
-                status_emoji = "⬆️" if difference > 0.1 else "➡️" if abs(difference) <= 0.1 else "⬇️"
-                f.write(f"{i}. {category}: {score:.2f} (vs overall {overall_avg:.2f}, {difference:+.2f}) {status_emoji}\n")
+            # Maintain config order instead of sorting by performance
+            for i, (category, questions) in enumerate(categories.items(), 1):
+                if category in stats['category_performance']:
+                    score = stats['category_performance'][category]
+                    # Show comparison with overall average
+                    comparison = stats['comparisons'].get(category, {})
+                    overall_avg = comparison.get('overall_score', 0)
+                    difference = comparison.get('difference', 0)
+                    
+                    status_emoji = "⬆️" if difference > 0.1 else "➡️" if abs(difference) <= 0.1 else "⬇️"
+                    f.write(f"{i}. {category}: {score:.2f} (vs overall {overall_avg:.2f}, {difference:+.2f}) {status_emoji}\n")
         else:
             f.write("No data available for selected combination.\n")
         f.write("\n")
@@ -175,20 +177,25 @@ def generate_text_report(stats, categories, recommendations, run_dir):
         f.write("DETAILED QUESTION ANALYSIS\n")
         f.write("-" * 40 + "\n")
         
-        for category_name, questions_data in stats['question_details'].items():
-            f.write(f"\n{category_name}:\n")
-            for question, data in questions_data.items():
-                filtered_score = data['filtered_score']
-                overall_score = data['overall_score']
-                difference = data['difference']
-                responses = data['filtered_responses']
-                
-                if filtered_score is not None:
-                    f.write(f"   • {question}: {filtered_score:.2f} "
-                           f"(vs overall {overall_score:.2f}, {difference:+.2f}) "
-                           f"({responses} responses)\n")
-                else:
-                    f.write(f"   • {question}: No data ({responses} responses)\n")
+        for category_name, questions_list in categories.items():
+            if category_name in stats['question_details']:
+                f.write(f"\n{category_name}:\n")
+                questions_data = stats['question_details'][category_name]
+                # Process questions in config order
+                for question in questions_list:
+                    if question in questions_data:
+                        data = questions_data[question]
+                        filtered_score = data['filtered_score']
+                        overall_score = data['overall_score']
+                        difference = data['difference']
+                        responses = data['filtered_responses']
+                        
+                        if filtered_score is not None:
+                            f.write(f"   • {question}: {filtered_score:.2f} "
+                                   f"(vs overall {overall_score:.2f}, {difference:+.2f}) "
+                                   f"({responses} responses)\n")
+                        else:
+                            f.write(f"   • {question}: No data ({responses} responses)\n")
         
         # Comments by Category
         if 'comments' in stats and stats['comments']:
