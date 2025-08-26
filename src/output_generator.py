@@ -108,7 +108,7 @@ def save_json_summary(stats, run_dir):
     return filename
 
 
-def generate_text_report(stats, categories, recommendations, run_dir):
+def generate_text_report(stats, categories, recommendations, run_dir, missing_questions=None):
     """
     Generate comprehensive text report.
     
@@ -138,7 +138,13 @@ def generate_text_report(stats, categories, recommendations, run_dir):
         f.write(f"Analysis Focus: {team_display} + {location_display}\n")
         f.write(f"Filtered Responses: {stats['metadata']['filtered_responses']}\n")
         f.write(f"Total Responses in Dataset: {stats['metadata']['total_responses']}\n")
-        f.write(f"Categories Analyzed: {len(categories)}\n\n")
+        f.write(f"Categories Analyzed: {len(categories)}\n")
+        
+        # Report missing questions if any
+        if missing_questions:
+            f.write(f"Missing Questions: {len(missing_questions)} questions from config not found in data\n")
+        
+        f.write("\n")
         
         # Executive Summary
         f.write("EXECUTIVE SUMMARY\n")
@@ -219,6 +225,15 @@ def generate_text_report(stats, categories, recommendations, run_dir):
         for i, recommendation in enumerate(recommendations, 1):
             f.write(f"{i}. {recommendation}\n")
         
+        # Add missing questions section if any
+        if missing_questions:
+            f.write(f"\nMISSING QUESTIONS FROM CONFIG\n")
+            f.write("-" * 40 + "\n")
+            f.write("The following questions were listed in config but not found in the data file:\n\n")
+            for category, question in missing_questions:
+                f.write(f"[{category}]\n")
+                f.write(f"   • {question}\n\n")
+        
         f.write("\n" + "=" * 80 + "\n")
         f.write(f"End of Detailed Report for {team_display} + {location_display}\n")
     
@@ -226,7 +241,7 @@ def generate_text_report(stats, categories, recommendations, run_dir):
 
 
 def save_analysis_results(df, stats, categories, comment_fields, recommendations, selected_team, selected_location, 
-                          team_column, location_column, overall_df, output_settings):
+                          team_column, location_column, overall_df, output_settings, missing_questions=None):
     """
     Save analysis results in all configured formats to a timestamped run directory.
     
@@ -261,7 +276,7 @@ def save_analysis_results(df, stats, categories, comment_fields, recommendations
     print(f"📋 Summary saved to: {os.path.basename(json_file)}")
     
     # Always save text report
-    txt_file = generate_text_report(stats, categories, recommendations, run_dir)
+    txt_file = generate_text_report(stats, categories, recommendations, run_dir, missing_questions)
     generated_files.append(txt_file)
     print(f"📄 Report saved to: {os.path.basename(txt_file)}")
     

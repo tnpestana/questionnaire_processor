@@ -42,7 +42,7 @@ def main():
         
         # Extract numeric scores from Likert responses
         likert_mapping = config.get('likert_mapping', None)
-        df_numeric, categories = extract_likert_scores(df, categories, likert_mapping)
+        df_numeric, categories, missing_questions = extract_likert_scores(df, categories, likert_mapping)
         
         # Analyze available groups
         group_info = analyze_available_groups(
@@ -97,7 +97,8 @@ def main():
             columns['team_column'],
             columns['location_column'],
             df_numeric,
-            output_settings
+            output_settings,
+            missing_questions
         )
         
         # Final success message

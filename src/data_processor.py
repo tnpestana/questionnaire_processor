@@ -56,18 +56,27 @@ def extract_likert_scores(df, categories, likert_mapping=None):
         likert_mapping (dict): Optional mapping of response text to numeric scores
         
     Returns:
-        tuple: (DataFrame with numeric columns, category groupings)
+        tuple: (DataFrame with numeric columns, category groupings, missing_questions)
     """
     df_numeric = df.copy()
     
     # Get Likert columns from categories configuration
     likert_columns = []
+    missing_questions = []
     for category_name, questions in categories.items():
         for question in questions:
             if question in df.columns:
                 likert_columns.append(question)
+            else:
+                missing_questions.append((category_name, question))
     
     print(f"📊 Converting {len(likert_columns)} Likert scale questions grouped into {len(categories)} categories...")
+    
+    if missing_questions:
+        print(f"⚠️  {len(missing_questions)} questions from config not found in data:")
+        for category, question in missing_questions:
+            print(f"   • [{category}] {question}")
+        print()
     
     # Convert each Likert column to numeric
     for col in likert_columns:
@@ -102,7 +111,7 @@ def extract_likert_scores(df, categories, likert_mapping=None):
         
         print(f"   ✅ {col} → {category_name}")
     
-    return df_numeric, categories
+    return df_numeric, categories, missing_questions
 
 
 def validate_columns(df, team_column, location_column):
