@@ -6,16 +6,8 @@ Handles user interaction and input collection.
 """
 
 
-def get_user_selections(group_info):
-    """
-    Prompt user to select specific team and location for detailed analysis.
-    
-    Args:
-        group_info (dict): Information about available groups
-        
-    Returns:
-        tuple: (selected_team, selected_location) or (None, None) if cancelled
-    """
+def get_user_selections(group_info: dict) -> tuple[str, str]:
+    """Prompt user to select specific team and location for detailed analysis."""
     print("\n" + "="*60)
     print("🎯 DETAILED ANALYSIS SELECTION")
     print("="*60)
@@ -106,15 +98,8 @@ def get_user_selections(group_info):
     return selected_team, selected_location
 
 
-def display_analysis_results(stats, categories, recommendations):
-    """
-    Display analysis results to the console.
-    
-    Args:
-        stats (dict): Analysis statistics
-        categories (dict): Category definitions
-        recommendations (list): Recommendations
-    """
+def display_analysis_results(stats: dict, categories: dict, recommendations: list) -> None:
+    """Display analysis results to the console."""
     selected_team = stats['metadata']['selected_team']
     selected_location = stats['metadata']['selected_location']
     

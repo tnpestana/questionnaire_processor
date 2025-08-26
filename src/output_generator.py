@@ -12,18 +12,8 @@ import pandas as pd
 from excel_visualizer import create_excel_dashboard
 
 
-def create_run_directory(base_output_dir, selected_team, selected_location):
-    """
-    Create a timestamped directory for this analysis run.
-    
-    Args:
-        base_output_dir (str): Base output directory path
-        selected_team (str): Selected team name
-        selected_location (str): Selected location name
-        
-    Returns:
-        str: Path to the created run directory
-    """
+def create_run_directory(base_output_dir: str, selected_team: str, selected_location: str) -> str:
+    """Create a timestamped directory for this analysis run."""
     # Create timestamp for this run
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     
@@ -41,34 +31,15 @@ def create_run_directory(base_output_dir, selected_team, selected_location):
     return run_dir
 
 
-def generate_filename(base_name, extension, run_dir):
-    """
-    Generate simple filename within the run directory.
-    
-    Args:
-        base_name (str): Base filename (e.g., 'data', 'summary', 'report')
-        extension (str): File extension
-        run_dir (str): Run directory path
-        
-    Returns:
-        str: Complete filename with path
-    """
+def generate_filename(base_name: str, extension: str, run_dir: str) -> str:
+    """Generate simple filename within the run directory."""
     filename = f"{base_name}.{extension}"
     return os.path.join(run_dir, filename)
 
 
 
-def save_json_summary(stats, run_dir):
-    """
-    Save analysis summary to JSON format.
-    
-    Args:
-        stats (dict): Analysis statistics
-        run_dir (str): Run directory path
-        
-    Returns:
-        str: Filename of saved file
-    """
+def save_json_summary(stats: dict, run_dir: str) -> str:
+    """Save analysis summary to JSON format."""
     filename = generate_filename("summary", "json", run_dir)
     
     # Prepare JSON data structure
@@ -108,19 +79,8 @@ def save_json_summary(stats, run_dir):
     return filename
 
 
-def generate_text_report(stats, categories, recommendations, run_dir, missing_questions=None):
-    """
-    Generate comprehensive text report.
-    
-    Args:
-        stats (dict): Analysis statistics
-        categories (dict): Category definitions
-        recommendations (list): List of recommendations
-        run_dir (str): Run directory path
-        
-    Returns:
-        str: Filename of saved file
-    """
+def generate_text_report(stats: dict, categories: dict, recommendations: list, run_dir: str, missing_questions: list = None) -> str:
+    """Generate comprehensive text report."""
     filename = generate_filename("report", "txt", run_dir)
     
     # Get team and location from stats
@@ -240,27 +200,10 @@ def generate_text_report(stats, categories, recommendations, run_dir, missing_qu
     return filename
 
 
-def save_analysis_results(df, stats, categories, comment_fields, recommendations, selected_team, selected_location, 
-                          team_column, location_column, overall_df, output_settings, missing_questions=None):
-    """
-    Save analysis results in all configured formats to a timestamped run directory.
-    
-    Args:
-        df (pandas.DataFrame): Processed/filtered data
-        stats (dict): Analysis statistics
-        categories (dict): Category definitions
-        comment_fields (dict): Comment field mappings
-        recommendations (list): Recommendations
-        selected_team (str): Selected team
-        selected_location (str): Selected location
-        team_column (str): Team column name
-        location_column (str): Location column name
-        overall_df (pandas.DataFrame): Complete original dataset
-        output_settings (dict): Output configuration
-        
-    Returns:
-        tuple: (run_directory_path, list_of_generated_filenames)
-    """
+def save_analysis_results(df: pd.DataFrame, stats: dict, categories: dict, comment_fields: dict, recommendations: list, 
+                          selected_team: str, selected_location: str, team_column: str, location_column: str, 
+                          overall_df: pd.DataFrame, output_settings: dict, missing_questions: list = None) -> tuple[str, list]:
+    """Save analysis results in all configured formats to a timestamped run directory."""
     # Create timestamped run directory (always use 'output' folder)
     run_dir = create_run_directory('output', selected_team, selected_location)
     

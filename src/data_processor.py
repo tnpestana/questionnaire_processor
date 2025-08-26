@@ -10,17 +10,8 @@ from tools import sanitize_text
 import pandas as pd
 import numpy as np
 
-def load_data(file_path, sheet_name=None):
-    """
-    Load data from Excel or CSV file.
-    
-    Args:
-        file_path (str): Path to the data file
-        sheet_name (str, optional): Excel sheet name
-        
-    Returns:
-        pandas.DataFrame: Loaded data
-    """
+def load_data(file_path: str, sheet_name: str = None) -> pd.DataFrame:
+    """Load data from Excel or CSV file."""
     try:
         if file_path.endswith('.xlsx') or file_path.endswith('.xls'):
             if sheet_name:
@@ -43,21 +34,8 @@ def load_data(file_path, sheet_name=None):
         raise Exception(f"Error loading data from {file_path}: {e}")
 
 
-def normalize_data(df, categories, likert_mapping=None):
-    """
-    Normalize raw survey data by cleaning column names, converting Likert responses,
-    and standardizing the DataFrame for analysis.
-    
-    Args:
-        df (pandas.DataFrame): Raw survey data
-        categories (dict): Dictionary mapping category names to question lists
-        likert_mapping (dict): Optional mapping of response text to numeric scores
-        
-    Returns:
-        tuple: (normalized_df, categories_with_clean_names, missing_questions)
-    """
-    import re
-    
+def normalize_data(df: pd.DataFrame, categories: dict, likert_mapping: dict = None) -> tuple[pd.DataFrame, dict, list]:
+    """Normalize raw survey data by cleaning column names, converting Likert responses, and standardizing the DataFrame for analysis."""
     # Step 1: Create normalized DataFrame with clean column names
     normalized_df = df.copy()
     column_mapping = {}  # Maps original column names to normalized names
@@ -131,21 +109,8 @@ def normalize_data(df, categories, likert_mapping=None):
     return normalized_df, matched_questions, missing_questions
 
 
-def validate_columns(df, team_column, location_column):
-    """
-    Validate that required columns exist in the dataframe.
-    
-    Args:
-        df (pandas.DataFrame): The dataframe to validate
-        team_column (str): Name of the team column
-        location_column (str): Name of the location column
-        
-    Returns:
-        bool: True if valid
-        
-    Raises:
-        ValueError: If required columns are missing
-    """
+def validate_columns(df: pd.DataFrame, team_column: str, location_column: str) -> bool:
+    """Validate that required columns exist in the dataframe."""
     missing_columns = []
     
     if team_column not in df.columns:
@@ -164,18 +129,8 @@ def validate_columns(df, team_column, location_column):
     return True
 
 
-def analyze_available_groups(df, team_column, location_column):
-    """
-    Analyze available teams and locations in the data.
-    
-    Args:
-        df (pandas.DataFrame): The DataFrame with data
-        team_column (str): Name of team column
-        location_column (str): Name of location column
-        
-    Returns:
-        dict: Information about available groups
-    """
+def analyze_available_groups(df: pd.DataFrame, team_column: str, location_column: str) -> dict:
+    """Analyze available teams and locations in the data."""
     group_info = {}
     
     if team_column and team_column in df.columns:
@@ -199,20 +154,8 @@ def analyze_available_groups(df, team_column, location_column):
     return group_info
 
 
-def filter_data(df, team_column, location_column, selected_team, selected_location):
-    """
-    Filter dataframe based on team and location selections.
-    
-    Args:
-        df (pandas.DataFrame): The dataframe to filter
-        team_column (str): Name of team column
-        location_column (str): Name of location column
-        selected_team (str): Selected team or 'all'
-        selected_location (str): Selected location or 'all'
-        
-    Returns:
-        pandas.DataFrame: Filtered dataframe
-    """
+def filter_data(df: pd.DataFrame, team_column: str, location_column: str, selected_team: str, selected_location: str) -> pd.DataFrame:
+    """Filter dataframe based on team and location selections."""
     filtered_df = df.copy()
     
     if selected_team != 'all':
@@ -224,19 +167,8 @@ def filter_data(df, team_column, location_column, selected_team, selected_locati
     return filtered_df
 
 
-def collect_comments(df, comment_fields, team_column, location_column):
-    """
-    Collect comments from the dataframe, organized by category.
-    
-    Args:
-        df (pandas.DataFrame): The dataframe containing comments
-        comment_fields (dict): Mapping of category names to comment column names
-        team_column (str): Name of team column
-        location_column (str): Name of location column
-        
-    Returns:
-        dict: Comments organized by category with metadata
-    """
+def collect_comments(df: pd.DataFrame, comment_fields: dict, team_column: str, location_column: str) -> dict:
+    """Collect comments from the dataframe, organized by category."""
     comments_by_category = {}
     
     for category_name, comment_column in comment_fields.items():

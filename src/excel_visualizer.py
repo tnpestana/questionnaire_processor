@@ -12,26 +12,9 @@ import os
 import numpy as np
 
 
-def create_excel_dashboard(stats, categories, comment_fields, overall_df, filtered_df, 
-                          team_column, location_column, selected_team, selected_location, run_dir):
-    """
-    Create an Excel file with multiple worksheets and embedded charts.
-    
-    Args:
-        stats (dict): Analysis statistics
-        categories (dict): Category definitions
-        comment_fields (dict): Comment field mappings
-        overall_df (pandas.DataFrame): Overall dataset
-        filtered_df (pandas.DataFrame): Filtered dataset
-        team_column (str): Team column name
-        location_column (str): Location column name
-        selected_team (str): Selected team
-        selected_location (str): Selected location
-        run_dir (str): Output directory path
-        
-    Returns:
-        str: Path to created Excel file
-    """
+def create_excel_dashboard(stats: dict, categories: dict, comment_fields: dict, overall_df: pd.DataFrame, filtered_df: pd.DataFrame,
+                          team_column: str, location_column: str, selected_team: str, selected_location: str, run_dir: str) -> str:
+    """Create an Excel file with multiple worksheets and embedded charts."""
     filename = os.path.join(run_dir, 'dashboard.xlsx')
     
     # Create workbook with xlsxwriter for chart support
@@ -85,7 +68,7 @@ def create_excel_dashboard(stats, categories, comment_fields, overall_df, filter
     return filename
 
 
-def create_summary_worksheet(workbook, stats, categories, selected_team, selected_location,
+def create_summary_worksheet(workbook, stats: dict, categories: dict, selected_team: str, selected_location: str,
                            header_format, subheader_format, number_format):
     """Create executive summary worksheet with key metrics."""
     worksheet = workbook.add_worksheet('Executive Summary')
@@ -158,7 +141,7 @@ def create_summary_worksheet(workbook, stats, categories, selected_team, selecte
     return worksheet
 
 
-def create_category_chart_worksheet(workbook, stats, categories, header_format, subheader_format, number_format):
+def create_category_chart_worksheet(workbook, stats: dict, categories: dict, header_format, subheader_format, number_format):
     """Create worksheet with category performance charts."""
     worksheet = workbook.add_worksheet('Category Analysis')
     
@@ -232,8 +215,8 @@ def create_category_chart_worksheet(workbook, stats, categories, header_format, 
     return worksheet
 
 
-def create_breakdown_worksheet(workbook, overall_df, filtered_df, categories, team_column, location_column,
-                              selected_team, selected_location, header_format, subheader_format, number_format):
+def create_breakdown_worksheet(workbook, overall_df: pd.DataFrame, filtered_df: pd.DataFrame, categories: dict, team_column: str, location_column: str,
+                              selected_team: str, selected_location: str, header_format, subheader_format, number_format):
     """Create worksheet with team/location breakdown charts."""
     worksheet = workbook.add_worksheet('Team-Location Breakdown')
     
@@ -328,7 +311,7 @@ def create_breakdown_worksheet(workbook, overall_df, filtered_df, categories, te
     return worksheet
 
 
-def create_data_worksheet(workbook, filtered_df, categories, comment_fields, header_format, subheader_format):
+def create_data_worksheet(workbook, filtered_df: pd.DataFrame, categories: dict, comment_fields: dict, header_format, subheader_format):
     """Create worksheet with detailed data."""
     worksheet = workbook.add_worksheet('Detailed Data')
     
@@ -381,7 +364,7 @@ def create_data_worksheet(workbook, filtered_df, categories, comment_fields, hea
     return worksheet
 
 
-def create_comments_worksheet(workbook, comments_data, selected_team, selected_location, header_format, subheader_format):
+def create_comments_worksheet(workbook, comments_data: dict, selected_team: str, selected_location: str, header_format, subheader_format):
     """Create worksheet with organized comments."""
     worksheet = workbook.add_worksheet('Comments')
     

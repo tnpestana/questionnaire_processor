@@ -9,16 +9,8 @@ import yaml
 import os
 
 
-def load_config(config_path="config.yaml"):
-    """
-    Load configuration from YAML file.
-    
-    Args:
-        config_path (str): Path to the YAML configuration file
-        
-    Returns:
-        dict: Configuration dictionary
-    """
+def load_config(config_path: str = "config.yaml") -> dict:
+    """Load configuration from YAML file."""
     try:
         with open(config_path, 'r', encoding='utf-8') as f:
             config = yaml.safe_load(f)
@@ -32,16 +24,8 @@ def load_config(config_path="config.yaml"):
 
 
 
-def validate_config(config):
-    """
-    Validate configuration structure and required fields.
-    
-    Args:
-        config (dict): Configuration dictionary
-        
-    Returns:
-        bool: True if valid, raises exception if invalid
-    """
+def validate_config(config: dict) -> bool:
+    """Validate configuration structure and required fields."""
     required_sections = ['data_source', 'columns', 'categories']
     
     for section in required_sections:
@@ -59,16 +43,8 @@ def validate_config(config):
     return True
 
 
-def get_output_settings(config):
-    """
-    Get output settings with defaults applied.
-    
-    Args:
-        config (dict): Configuration dictionary
-        
-    Returns:
-        dict: Output settings
-    """
+def get_output_settings(config: dict) -> dict:
+    """Get output settings with defaults applied."""
     output_config = config.get('output', {})
     
     return {
@@ -76,16 +52,8 @@ def get_output_settings(config):
     }
 
 
-def get_analysis_settings(config):
-    """
-    Get analysis settings with defaults applied.
-    
-    Args:
-        config (dict): Configuration dictionary
-        
-    Returns:
-        dict: Analysis settings
-    """
+def get_analysis_settings(config: dict) -> dict:
+    """Get analysis settings with defaults applied."""
     analysis_config = config.get('analysis', {})
     
     return {

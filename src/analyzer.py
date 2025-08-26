@@ -9,17 +9,8 @@ import pandas as pd
 import numpy as np
 from data_processor import collect_comments
 
-def calculate_category_scores(df, categories):
-    """
-    Calculate average scores for each category.
-    
-    Args:
-        df (pandas.DataFrame): DataFrame with numeric columns
-        categories (dict): Dictionary mapping category names to question lists
-        
-    Returns:
-        dict: Category scores
-    """
+def calculate_category_scores(df: pd.DataFrame, categories: dict) -> dict:
+    """Calculate average scores for each category."""
     category_scores = {}
     for category_name, questions in categories.items():
         if questions and len(df) > 0:
@@ -38,18 +29,8 @@ def calculate_category_scores(df, categories):
     return category_scores
 
 
-def compare_with_overall(filtered_df, overall_df, categories):
-    """
-    Compare filtered data scores with overall averages.
-    
-    Args:
-        filtered_df (pandas.DataFrame): Filtered dataset
-        overall_df (pandas.DataFrame): Overall dataset
-        categories (dict): Category definitions
-        
-    Returns:
-        dict: Comparison results
-    """
+def compare_with_overall(filtered_df: pd.DataFrame, overall_df: pd.DataFrame, categories: dict) -> dict:
+    """Compare filtered data scores with overall averages."""
     comparisons = {}
     
     for category_name, questions in categories.items():
@@ -86,18 +67,8 @@ def compare_with_overall(filtered_df, overall_df, categories):
     return comparisons
 
 
-def get_performance_status(difference, significant_threshold=0.2, similar_threshold=0.1):
-    """
-    Determine performance status based on difference from overall average.
-    
-    Args:
-        difference (float): Score difference
-        significant_threshold (float): Threshold for significant difference
-        similar_threshold (float): Threshold for similar performance
-        
-    Returns:
-        str: Performance status
-    """
+def get_performance_status(difference: float, significant_threshold: float = 0.2, similar_threshold: float = 0.1) -> str:
+    """Determine performance status based on difference from overall average."""
     if difference > significant_threshold:
         return "significantly_above"
     elif difference > similar_threshold:
@@ -110,24 +81,9 @@ def get_performance_status(difference, significant_threshold=0.2, similar_thresh
         return "below"
 
 
-def generate_detailed_statistics(filtered_df, overall_df, categories, comment_fields, team_column, location_column, 
-                                selected_team, selected_location):
-    """
-    Generate detailed statistics for the selected combination.
-    
-    Args:
-        filtered_df (pandas.DataFrame): Filtered data
-        overall_df (pandas.DataFrame): Overall data
-        categories (dict): Category definitions
-        comment_fields (dict): Comment field mappings
-        team_column (str): Team column name
-        location_column (str): Location column name
-        selected_team (str): Selected team
-        selected_location (str): Selected location
-        
-    Returns:
-        dict: Detailed statistics
-    """
+def generate_detailed_statistics(filtered_df: pd.DataFrame, overall_df: pd.DataFrame, categories: dict, comment_fields: dict, 
+                                team_column: str, location_column: str, selected_team: str, selected_location: str) -> dict:
+    """Generate detailed statistics for the selected combination."""
     stats = {
         'metadata': {
             'selected_team': selected_team,
@@ -180,17 +136,8 @@ def generate_detailed_statistics(filtered_df, overall_df, categories, comment_fi
     return stats
 
 
-def get_recommendations(stats, categories):
-    """
-    Generate recommendations based on analysis results.
-    
-    Args:
-        stats (dict): Detailed statistics
-        categories (dict): Category definitions
-        
-    Returns:
-        list: List of recommendation strings
-    """
+def get_recommendations(stats: dict, categories: dict) -> list:
+    """Generate recommendations based on analysis results."""
     recommendations = []
     
     if stats['metadata']['filtered_responses'] == 0:
