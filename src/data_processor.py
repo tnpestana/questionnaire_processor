@@ -99,14 +99,22 @@ def extract_likert_scores(df, categories, likert_mapping=None):
             
             text_str = str(text).strip()
             
-            # Use mapping from config
+            # Use mapping from config - try exact match first
             if likert_mapping and text_str in likert_mapping:
                 return likert_mapping[text_str]
             
-            # Case-insensitive fallback
+            # Normalize whitespace and try again
             if likert_mapping:
+                normalized_text = text_str.replace('\u00a0', ' ').strip()
+                
+                # Try normalized exact match
+                if normalized_text in likert_mapping:
+                    return likert_mapping[normalized_text]
+                
+                # Try normalized case-insensitive match
                 for key, value in likert_mapping.items():
-                    if text_str.lower() == key.lower():
+                    normalized_key = key.replace('\u00a0', ' ').strip()
+                    if normalized_text.lower() == normalized_key.lower():
                         return value
             
             return np.nan
