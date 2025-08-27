@@ -2,14 +2,13 @@
 """
 Output Generation Module
 
-Handles file output generation in multiple formats (JSON, TXT, Excel).
+Handles file output generation in multiple formats (JSON, TXT).
 """
 
 import json
 import os
 from datetime import datetime
 import pandas as pd
-from excel_visualizer import create_excel_dashboard
 
 
 def create_run_directory(base_output_dir: str, selected_team: str, selected_location: str) -> str:
@@ -223,13 +222,6 @@ def save_analysis_results(df: pd.DataFrame, stats: dict, categories: dict, comme
     generated_files.append(txt_file)
     print(f"📄 Report saved to: {os.path.basename(txt_file)}")
     
-    # Always save Excel dashboard with charts
-    excel_file = create_excel_dashboard(
-        stats, categories, comment_fields, overall_df, df,
-        team_column, location_column, selected_team, selected_location, run_dir
-    )
-    generated_files.append(excel_file)
-    print(f"📊 Excel dashboard saved to: {os.path.basename(excel_file)}")
     
     print(f"\n📁 All files saved in: {run_dir}")
     
