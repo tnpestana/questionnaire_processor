@@ -146,6 +146,23 @@ def generate_text_report(stats: dict, categories: dict, recommendations: list, r
             if category_name in stats['question_details']:
                 f.write(f"\n{category_name}:\n")
                 questions_data = stats['question_details'][category_name]
+                
+                # Find highest and lowest scoring questions in this category
+                valid_questions = []
+                for question in questions_list:
+                    if question in questions_data and questions_data[question]['filtered_score'] is not None:
+                        valid_questions.append((question, questions_data[question]['filtered_score']))
+                
+                if valid_questions:
+                    # Sort by score to find highest and lowest
+                    sorted_questions = sorted(valid_questions, key=lambda x: x[1], reverse=True)
+                    highest_question, highest_score = sorted_questions[0]
+                    lowest_question, lowest_score = sorted_questions[-1]
+                    
+                    f.write(f"   🔥 Highest: {highest_question} ({highest_score:.2f})\n")
+                    f.write(f"   ❄️  Lowest: {lowest_question} ({lowest_score:.2f})\n")
+                    f.write(f"\n")
+                
                 # Process questions in config order
                 for question in questions_list:
                     if question in questions_data:
