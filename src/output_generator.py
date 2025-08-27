@@ -114,12 +114,24 @@ def generate_text_report(stats: dict, categories: dict, recommendations: list, r
             valid_categories = [(cat, score) for cat, score in stats['category_performance'].items() if score is not None]
             if valid_categories:
                 sorted_categories = sorted(valid_categories, key=lambda x: x[1], reverse=True)
-                highest_cat, highest_score = sorted_categories[0]
-                lowest_cat, lowest_score = sorted_categories[-1]
+                highest_score = sorted_categories[0][1]
+                lowest_score = sorted_categories[-1][1]
                 
-                f.write(f"🔥 Highest Category: {highest_cat} ({highest_score:.2f})\n")
-                f.write(f"❄️ Lowest Category: {lowest_cat} ({lowest_score:.2f})\n\n")
+                # Find all categories with highest score
+                highest_cats = [cat for cat, score in valid_categories if score == highest_score]
+                # Find all categories with lowest score
+                lowest_cats = [cat for cat, score in valid_categories if score == lowest_score]
+                
+                f.write("🔥 Highest:\n")
+                for cat in highest_cats:
+                    f.write(f"   • {cat} ({highest_score:.2f})\n")
+                
+                f.write("❄️ Lowest:\n")
+                for cat in lowest_cats:
+                    f.write(f"   • {cat} ({lowest_score:.2f})\n")
+                f.write("\n")
             
+            f.write("All:\n")
             # Maintain config order instead of sorting by performance
             for i, (category, questions) in enumerate(categories.items(), 1):
                 if category in stats['category_performance']:
@@ -130,7 +142,7 @@ def generate_text_report(stats: dict, categories: dict, recommendations: list, r
                     difference = comparison.get('difference', 0)
                     
                     status_emoji = "⬆️" if difference > 0.1 else "➡️" if abs(difference) <= 0.1 else "⬇️"
-                    f.write(f"{i}. {category}: {score:.2f} (vs overall {overall_avg:.2f}, {difference:+.2f}) {status_emoji}\n")
+                    f.write(f"   • {category}: {score:.2f} (vs overall {overall_avg:.2f}, {difference:+.2f}) {status_emoji}\n")
         else:
             f.write("No data available for selected combination.\n")
         f.write("\n")
@@ -153,13 +165,24 @@ def generate_text_report(stats: dict, categories: dict, recommendations: list, r
                 if valid_questions:
                     # Sort by score to find highest and lowest
                     sorted_questions = sorted(valid_questions, key=lambda x: x[1], reverse=True)
-                    highest_question, highest_score = sorted_questions[0]
-                    lowest_question, lowest_score = sorted_questions[-1]
+                    highest_score = sorted_questions[0][1]
+                    lowest_score = sorted_questions[-1][1]
                     
-                    f.write(f"   🔥 Highest: {highest_question} ({highest_score:.2f})\n")
-                    f.write(f"   ❄️ Lowest: {lowest_question} ({lowest_score:.2f})\n")
-                    f.write(f"\n")
+                    # Find all questions with highest score
+                    highest_questions = [q for q, score in valid_questions if score == highest_score]
+                    # Find all questions with lowest score
+                    lowest_questions = [q for q, score in valid_questions if score == lowest_score]
+                    
+                    f.write("🔥 Highest:\n")
+                    for q in highest_questions:
+                        f.write(f"   • {q} ({highest_score:.2f})\n")
+                    
+                    f.write("❄️ Lowest:\n")
+                    for q in lowest_questions:
+                        f.write(f"   • {q} ({lowest_score:.2f})\n")
+                    f.write("\n")
                 
+                f.write("All:\n")
                 # Process questions in config order
                 for question in questions_list:
                     if question in questions_data:
