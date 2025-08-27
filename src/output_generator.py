@@ -105,24 +105,21 @@ def generate_text_report(stats: dict, categories: dict, recommendations: list, r
         
         f.write("\n")
         
-        # Executive Summary
-        f.write("EXECUTIVE SUMMARY\n")
-        f.write("-" * 40 + "\n")
-        
-        if stats['category_performance']:
-            best_category = max(stats['category_performance'], key=stats['category_performance'].get)
-            worst_category = min(stats['category_performance'], key=stats['category_performance'].get)
-            f.write(f"• Highest performing category for selected combination: {best_category} "
-                   f"(avg: {stats['category_performance'][best_category]:.2f})\n")
-            f.write(f"• Lowest performing category for selected combination: {worst_category} "
-                   f"(avg: {stats['category_performance'][worst_category]:.2f})\n")
-        f.write("\n")
-        
         # Category Performance Analysis
         f.write(f"CATEGORY PERFORMANCE ANALYSIS - {team_display} + {location_display}\n")
         f.write("-" * 40 + "\n")
         
         if stats['category_performance']:
+            # Find highest and lowest performing categories
+            valid_categories = [(cat, score) for cat, score in stats['category_performance'].items() if score is not None]
+            if valid_categories:
+                sorted_categories = sorted(valid_categories, key=lambda x: x[1], reverse=True)
+                highest_cat, highest_score = sorted_categories[0]
+                lowest_cat, lowest_score = sorted_categories[-1]
+                
+                f.write(f"🔥 Highest Category: {highest_cat} ({highest_score:.2f})\n")
+                f.write(f"❄️ Lowest Category: {lowest_cat} ({lowest_score:.2f})\n\n")
+            
             # Maintain config order instead of sorting by performance
             for i, (category, questions) in enumerate(categories.items(), 1):
                 if category in stats['category_performance']:
@@ -160,7 +157,7 @@ def generate_text_report(stats: dict, categories: dict, recommendations: list, r
                     lowest_question, lowest_score = sorted_questions[-1]
                     
                     f.write(f"   🔥 Highest: {highest_question} ({highest_score:.2f})\n")
-                    f.write(f"   ❄️  Lowest: {lowest_question} ({lowest_score:.2f})\n")
+                    f.write(f"   ❄️ Lowest: {lowest_question} ({lowest_score:.2f})\n")
                     f.write(f"\n")
                 
                 # Process questions in config order
